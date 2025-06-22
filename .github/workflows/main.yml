@@ -1,0 +1,30 @@
+name: Faucet Auto Dripper
+
+on:
+  schedule:
+    - cron: "34 4 27 * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout кода
+        uses: actions/checkout@v4
+
+      - name: Установить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Установить зависимости
+        run: |
+          pip install -r requirements.txt
+
+      - name: Установить браузеры Playwright
+        run: |
+          playwright install chromium
+
+      - name: Запустить задачу
+        run: |
+          python faucet.py
