@@ -28,3 +28,11 @@ jobs:
       - name: Запустить задачу
         run: |
           python faucet.py
+
+      - name: Upload screenshot and HTML
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-output
+          path: |
+            error_screenshot.png
+            page_source.html
