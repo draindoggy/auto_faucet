@@ -11,28 +11,31 @@ def run_task():
 
         print("Открываю страницу...")
         page.goto(URL)
-        page.wait_for_timeout(5000)  # ждём прогрузки JS
 
         try:
-            wallet_input = page.locator('//input[@placeholder="Enter wallet address"]')
+            wallet_input = page.locator("input[placeholder='Enter wallet address']")
+            wallet_input.wait_for_selector_state("visible", timeout=60000)
             wallet_input.fill(WALLET_ADDRESS)
             print("Адрес кошелька введён")
 
-            page.click('//button[.//span[text()="Request tokens"]]')
+            page.click("button:has-text('Request tokens')", timeout=30000)
             print("Кнопка нажата")
 
-            error_locator = page.locator('//xap-callout-body')
-            if error_locator.is_visible(timeout=10000):
-                error_text = error_locator.inner_text()
-                if "Each Google Account and wallet address gets one drip on Sepolia every 1 day" in error_text:
+            try:
+                error_text = page.text_content("//xap-callout-body", timeout=10000)
+                if "gets one drip on Sepolia every 1 day" in error_text:
                     print("Лимит достигнут:", error_text)
                 else:
-                    print("Другая ошибка:", error_text)
-            else:
-                print("Запрос успешен!")
+                    print("Другое сообщение:", error_text)
+            except:
+                print("Сообщение об ошибке не найдено.")
 
         except Exception as e:
             print(f"Ошибка при выполнении: {e}")
+            # Для диагностики: сохрани HTML и сделай скриншот
+            page.screenshot(path="error_screenshot.png")
+            with open("page_source.html", "w") as f:
+                f.write(page.content())
 
         finally:
             browser.close()
